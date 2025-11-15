@@ -1,13 +1,26 @@
-import streamlit as st
+# pages/Dashboard.py
+import os, io
 import pandas as pd
-import os
+import streamlit as st
 
-st.title("Dashboard — Class Overview")
-st.caption("Upload results.csv to visualize cohort metrics.")
+st.title("Dashboard — Class Overview & Exports")
 
-path = "data/results.csv"
-if os.path.exists(path):
-    df = pd.read_csv(path)
-    st.dataframe(df.head(50))
-else:
-    st.info("No data/results.csv yet. (You can extend MT_Lab to append results here.)")
+def downloadable(path, label, fname):
+    if os.path.exists(path):
+        buf = io.BytesIO(open(path,"rb").read())
+        st.download_button(f"⬇️ {label}", buf, file_name=fname, mime="text/csv")
+    else:
+        st.info(f"{path} not found yet.")
+
+st.subheader("Datasets")
+downloadable("data/sample_pairs.csv", "Download sample_pairs.csv", "sample_pairs.csv")
+downloadable("data/tickets.csv", "Download tickets.csv", "tickets.csv")
+
+st.subheader("Research data")
+downloadable("data/results.csv", "Download results.csv (submissions + metrics)", "results.csv")
+
+# (optional) quick preview
+for p in ["data/results.csv","data/tickets.csv","data/sample_pairs.csv"]:
+    if os.path.exists(p):
+        st.markdown(f"#### Preview: {p}")
+        st.dataframe(pd.read_csv(p).head(50), use_container_width=True)
