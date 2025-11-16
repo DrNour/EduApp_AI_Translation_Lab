@@ -4,3 +4,5 @@ requests>=2.31
 openai>=1.52.0
 sacrebleu>=2.4
 pyter3>=0.3
+openai>=1.52.0
+
