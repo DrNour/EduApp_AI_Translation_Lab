@@ -2,7 +2,3 @@ streamlit>=1.36
 pandas>=1.5
 requests>=2.31
 openai>=1.52.0
-sacrebleu>=2.4
-pyter3>=0.3
-openai>=1.52.0
-
