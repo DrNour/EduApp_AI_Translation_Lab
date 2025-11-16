@@ -2,10 +2,17 @@
 import os, io
 import pandas as pd
 import streamlit as st
-from utils_mt import (
-    ensure_sample_pairs, load_pairs,
-    ensure_tickets_file, load_tickets, save_tickets, add_ticket
-)
+
+# Robust import with a helpful error if it fails
+try:
+    from utils_mt import (
+        ensure_sample_pairs, load_pairs,
+        ensure_tickets_file, load_tickets, save_tickets, add_ticket
+    )
+except Exception as e:
+    st.error("Could not import from utils_mt. Make sure 'utils_mt.py' exists at the repo root and contains the required functions.")
+    st.exception(e)
+    st.stop()
 
 st.title("Admin")
 st.caption("Create data, paste tickets, assign students, and download CSVs for research.")
