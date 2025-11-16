@@ -11,6 +11,17 @@ from metrics import score_all
 st.title("MT Lab — OpenAI Translation")
 st.caption("Work on a dataset item or a ticket, translate with OpenAI, post-edit, and save results for research.")
 
+def _s(x):
+    """Safe string: turn None/NaN into empty string."""
+    try:
+        import pandas as pd
+        if x is None or (isinstance(x, float) and pd.isna(x)):
+            return ""
+    except Exception:
+        if x is None:
+            return ""
+    return str(x)
+
 # Identity (simple — username only)
 student = st.text_input("Your username (e.g., student_id or email alias)", key="student")
 if not student:
@@ -162,3 +173,4 @@ else:
                     st.success("Saved to data/results.csv and marked ticket submitted ✅")
     else:
         st.info("No tickets assigned to you yet. Ask instructor to assign or let you claim one.")
+
