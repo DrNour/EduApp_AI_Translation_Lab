@@ -1,4 +1,4 @@
-# utils_mt.py
+# utils_mt.py  (PUT THIS AT REPO ROOT, SAME LEVEL AS Home.py)
 from openai import OpenAI
 import os, pandas as pd, time
 
@@ -32,7 +32,7 @@ def mt_openai(
     except Exception as e:
         return f"[OpenAI error: {e}]"
 
-# -------------------- Sample pairs --------------------
+# -------------------- Pairs dataset --------------------
 def ensure_sample_pairs():
     os.makedirs("data", exist_ok=True)
     path = "data/sample_pairs.csv"
@@ -93,7 +93,7 @@ def add_ticket(ticket_id: str, source: str, reference: str = "", src_lang="en", 
     df = pd.concat([df, pd.DataFrame([new])], ignore_index=True)
     save_tickets(df)
 
-# -------------------- Results logging (for research) --------------------
+# -------------------- Results logging (research export) --------------------
 RESULTS_PATH = "data/results.csv"
 
 def append_result(row: dict):
