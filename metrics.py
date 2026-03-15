@@ -1,25 +1,52 @@
-# metrics.py
-from typing import Dict, List
-import re
+from typing import Dict, List, Union
+from sacrebleu.metrics import BLEU, TER
+from bert_score import score as bertscore_score
 
-def _tok(s: str) -> List[str]:
-    return re.findall(r"\w+|\S", s.strip(), flags=re.UNICODE)
 
-def _ngram_precision(cand: str, ref: str, n:int=2) -> float:
-    c = _tok(cand); r = _tok(ref)
-    if len(c) < n or len(r) < n: return 0.0
-    def ngrams(seq, n): return [" ".join(seq[i:i+n]) for i in range(len(seq)-n+1)]
-    c_ngrams = ngrams(c, n); r_ngrams = set(ngrams(r, n))
-    if not c_ngrams: return 0.0
-    match = sum(1 for g in c_ngrams if g in r_ngrams)
-    return match / len(c_ngrams)
+bleu_metric = BLEU()
+ter_metric = TER()
 
-def _len_ratio(cand: str, ref: str) -> float:
-    return (len(_tok(cand)) + 1e-9) / (len(_tok(ref)) + 1e-9)
 
-def score_all(candidate: str, reference: str) -> Dict[str, float]:
+def score_all(candidate: str, reference: str, lang: str = "en") -> Dict[str, Union[float, str]]:
+    """
+    Compute BLEU, TER, and BERTScore for a candidate translation against a reference.
+
+    Args:
+        candidate: MT output or post-edited text
+        reference: Gold/reference translation
+        lang: Language code for BERTScore model selection (default: 'en')
+
+    Returns:
+        Dict of metric scores.
+    """
+    candidate = (candidate or "").strip()
+    reference = (reference or "").strip()
+
+    if not candidate or not reference:
+        return {
+            "bleu": 0.0,
+            "ter": 100.0,
+            "bertscore_precision": 0.0,
+            "bertscore_recall": 0.0,
+            "bertscore_f1": 0.0,
+        }
+
+    # sacrebleu expects: sys_stream, [ref_streams]
+    bleu = bleu_metric.sentence_score(candidate, [reference]).score
+    ter = ter_metric.sentence_score(candidate, [reference]).score
+
+    # BERTScore returns tensors
+    P, R, F1 = bertscore_score(
+        [candidate],
+        [reference],
+        lang=lang,
+        verbose=False
+    )
+
     return {
-        "p1": _ngram_precision(candidate, reference, 1),
-        "p2": _ngram_precision(candidate, reference, 2),
-        "len_ratio": _len_ratio(candidate, reference),
+        "bleu": round(float(bleu), 4),
+        "ter": round(float(ter), 4),
+        "bertscore_precision": round(float(P[0]), 4),
+        "bertscore_recall": round(float(R[0]), 4),
+        "bertscore_f1": round(float(F1[0]), 4),
     }
