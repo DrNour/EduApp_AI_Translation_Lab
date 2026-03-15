@@ -2,5 +2,7 @@ streamlit>=1.36
 pandas>=1.5
 requests>=2.31
 openai>=1.52.0
-sacrebleu
-pyter3
+sacrebleu>=2.4.0
+bert-score>=0.3.13
+torch
+sentencepiece
